@@ -87,12 +87,14 @@
 
 /obj/machinery/light/rogue/firebowl/lighthouse
 	desc = "A massive wrought metal platter upon a heavy base. A bright roaring fire burns bright atop."
+	icon = 'icons/roguetown/misc/lightingbig.dmi'
 	icon_state = "lighthousefire1"
 	base_state = "lighthousefire1"
 
 /obj/machinery/light/rogue/firebowl/lighthouse/off
-	icon_state = "lighthousefire1"
-	base_state = "lighthousefire1"
+	icon = 'icons/roguetown/misc/lightingbig.dmi'
+	icon_state = "lighthousefire0"
+	base_state = "lighthousefire0"
 	soundloop = null
 	status = LIGHT_BURNED
 	desc = "The Lighthouse is not lit...this is a grave omen"
