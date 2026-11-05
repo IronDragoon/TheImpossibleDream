@@ -90087,6 +90087,15 @@
 /obj/machinery/light/rogue/candle/blue/r,
 /turf/open/floor/rogue/cobble,
 /area/rogue/indoors/town/church/basement)
+"prb" = (
+/obj/structure/closet/crate/drawer{
+	pixel_y = 7;
+	pixel_x = 5
+	},
+/turf/open/floor/rogue/ruinedwood/spiral{
+	color = "#3d4147"
+	},
+/area/rogue/outdoors/mountains)
 "prf" = (
 /turf/closed/wall/mineral/rogue/decostone/end,
 /area/rogue/indoors/shelter)
@@ -112597,6 +112606,15 @@
 	},
 /turf/open/floor/rogue/churchmarble,
 /area/rogue/indoors/town/bath)
+"tku" = (
+/obj/structure/closet/crate/drawer{
+	pixel_y = 7;
+	pixel_x = -5
+	},
+/turf/open/floor/rogue/ruinedwood/spiral{
+	color = "#3d4147"
+	},
+/area/rogue/outdoors/mountains)
 "tkB" = (
 /obj/structure/fluff/walldeco/church/line{
 	dir = 8;
@@ -125236,6 +125254,14 @@
 /obj/structure/flora/roguegrass/bush,
 /turf/open/floor/rogue/grassred,
 /area/rogue/outdoors/woods/south)
+"vwy" = (
+/obj/structure/bed/rogue{
+	dir = 8
+	},
+/turf/open/floor/rogue/ruinedwood/spiral{
+	color = "#3d4147"
+	},
+/area/rogue/outdoors/mountains)
 "vwB" = (
 /obj/structure/fluff/railing/border,
 /obj/structure/fluff/railing/border,
@@ -128384,6 +128410,12 @@
 /obj/effect/landmark/start/templar,
 /turf/open/floor/rogue/church,
 /area/rogue/indoors/town/church/chapel)
+"vWM" = (
+/obj/structure/bed/rogue,
+/turf/open/floor/rogue/ruinedwood/spiral{
+	color = "#3d4147"
+	},
+/area/rogue/outdoors/mountains)
 "vWN" = (
 /obj/structure/flora/roguegrass,
 /obj/effect/decal/edge{
@@ -139921,6 +139953,15 @@
 "xXX" = (
 /turf/closed/wall/mineral/rogue/wooddark/vertical,
 /area/rogue/indoors/town/physician)
+"xXY" = (
+/obj/structure/bars/grille,
+/obj/machinery/light/rogue/firebowl/lighthouse{
+	pixel_x = -32;
+	pixel_y = -8;
+	name = "The Light"
+	},
+/turf/open/transparent/openspace,
+/area/rogue/outdoors/mountains)
 "xYa" = (
 /obj/structure/fluff/railing/border/east,
 /turf/open/floor/rogue/hexstone,
@@ -435869,11 +435910,11 @@ iiY
 cLz
 cLz
 cLz
-dLK
-dLK
-dLK
-dLK
-dLK
+tku
+vwy
+cLz
+tku
+vwy
 cLz
 cLz
 cLz
@@ -436320,13 +436361,13 @@ iiY
 cLz
 cLz
 dLK
+cLz
 dLK
 dLK
+cLz
 dLK
 dLK
-dLK
-dLK
-dLK
+cLz
 dLK
 cLz
 cLz
@@ -437224,13 +437265,13 @@ cLz
 cLz
 cLz
 dLK
+cLz
 dLK
 dLK
+cLz
 dLK
 dLK
-dLK
-dLK
-dLK
+cLz
 dLK
 cLz
 cLz
@@ -437676,13 +437717,13 @@ cLz
 iiY
 cLz
 dLK
-dLK
-dLK
-dLK
-dLK
-dLK
-dLK
-dLK
+cLz
+prb
+vWM
+cLz
+prb
+vWM
+cLz
 dLK
 cLz
 iiY
@@ -553391,9 +553432,9 @@ dLK
 dLK
 cLz
 cLz
-cLz
-cLz
-cLz
+dLK
+dLK
+dLK
 cLz
 cLz
 dLK
@@ -554293,13 +554334,13 @@ dLK
 dLK
 dLK
 dLK
-cLz
+dLK
 akG
 akG
 akG
 akG
 akG
-cLz
+dLK
 dLK
 dLK
 dLK
@@ -554745,13 +554786,13 @@ dLK
 dLK
 dLK
 dLK
-cLz
+dLK
 akG
 akG
+xXY
 akG
 akG
-akG
-cLz
+dLK
 dLK
 dLK
 dLK
@@ -555197,13 +555238,13 @@ dLK
 dLK
 dLK
 dLK
-cLz
+dLK
 akG
 akG
 akG
 akG
 akG
-cLz
+dLK
 dLK
 dLK
 dLK
@@ -556103,9 +556144,9 @@ dLK
 dLK
 cLz
 cLz
-cLz
-cLz
-cLz
+dLK
+dLK
+dLK
 cLz
 cLz
 dLK
