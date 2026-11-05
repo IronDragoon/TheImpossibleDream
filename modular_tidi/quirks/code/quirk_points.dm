@@ -62,12 +62,6 @@
 /datum/charflaw/limbloss/arm_r
 	point_value = 2
 
-/datum/charflaw/limbloss/leg_l
-	point_value = 1
-
-/datum/charflaw/limbloss/leg_r
-	point_value = 1
-
 /mob/living/carbon/human
 	var/unspent_quirk_points = 0
 
