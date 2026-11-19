@@ -593,7 +593,11 @@
 					continue
 				AM.Crossed(src, oldloc)
 
+		// [SURREALIS-REMOVE] - PLASMA_OPTS
+		/*
 		Moved(oldloc, NONE, TRUE)
+		*/
+		// [/SURREALIS-REMOVE]
 		. = TRUE
 
 	//If no destination, move the atom into nullspace (don't do this unless you know what you're doing)
@@ -604,7 +608,11 @@
 			oldloc.Exited(src, null)
 			if(old_area)
 				old_area.Exited(src, null)
+			// [SURREALIS-REMOVE] - PLASMA_OPTS
+			/*
 			Moved(oldloc, NONE, TRUE)
+			*/
+			// [/SURREALIS-REMOVE]
 		loc = null
 	RESOLVE_ACTIVE_MOVEMENT
 
@@ -1018,6 +1026,15 @@ GLOBAL_VAR_INIT(pixel_diff_time, 1)
 					atk_effrange.icon_state = "effrange"
 					atk_effrange.layer = (atk.layer + 0.1)	//Should always be on top of the regular indicator.
 			first_step = next_step
+	if(wiggle)
+		wiggle(A)
+
+/atom/movable/proc/do_attack_animation_at(atom/A, visual_effect_icon, wiggle = TRUE, datum/intent/used_intent)
+	var/newdir = get_dir(src, A)
+	var/obj/effect/temp_visual/dir_setting/attack_effect/atk = new(get_turf(A), newdir)
+	atk.icon_state = visual_effect_icon
+	atk.mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	atk.layer = ABOVE_MOB_LAYER
 	if(wiggle)
 		wiggle(A)
 

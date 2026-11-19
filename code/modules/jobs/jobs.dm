@@ -123,11 +123,18 @@ GLOBAL_LIST_INIT(church_positions, list( //Church of the Ten
 	"Bishop",
 	"Martyr",
 	"Templar",
+	// [SURREALIS-EDIT] - LORE
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	"Keeper",
 	"Druid",
 	"Acolyte",
 	"Sexton",
 	"Painter",
+	*/
+	"Acolyte",
+	"Sexton",
+	// [/SURREALIS-EDIT]
 ))
 
 GLOBAL_LIST_INIT(burgher_positions, list( //Artisans, store owners what have you.
@@ -136,6 +143,9 @@ GLOBAL_LIST_INIT(burgher_positions, list( //Artisans, store owners what have you
 	"Tailor",
 	"Head Physician",
 	"Apothecary",
+	// [SURREALIS-ADD] - LORE
+	"Keeper",
+	// [/SURREALIS-ADD]
 	"Innkeeper",
 	"Bathmaster",
 	"Magicians Associate",
@@ -160,6 +170,9 @@ GLOBAL_LIST_INIT(producer_positions, list(
 	"Guildsman",
 	"Guildmaster",
 	"Apothecary",
+	// [SURREALIS-ADD] - LORE
+	"Keeper",
+	// [/SURREALIS-ADD]
 	"Head Physician",
 	"Magicians Associate",
 	"Court Magician",
@@ -282,7 +295,7 @@ GLOBAL_LIST_INIT(exp_jobsmap, list(
 
 GLOBAL_LIST_INIT(exp_specialmap, list(
 	EXP_TYPE_LIVING = list(), // all living mobs
-	EXP_TYPE_ANTAG = list(ROLE_MANIAC, ROLE_PREBEL, ROLE_REBEL_LEADER, ROLE_BANDIT, ROLE_ASPIRANT, ROLE_WEREWOLF, ROLE_NBEAST, ROLE_VAMPIRE, ROLE_LICH, ROLE_DREAMWALKER, ROLE_GNOLL, ROLE_ASSASSIN, ROLE_HAG),
+	EXP_TYPE_ANTAG = list(ROLE_MANIAC, ROLE_PREBEL, ROLE_REBEL_LEADER, ROLE_BANDIT, ROLE_ASPIRANT, ROLE_WEREWOLF, ROLE_NBEAST, ROLE_VAMPIRE, ROLE_LICH, ROLE_DREAMWALKER, ROLE_GNOLL, ROLE_ASSASSIN, ROLE_HAG, ROLE_RENEGADE),
 	EXP_TYPE_SPECIAL = list("Lifebringer","Ash Walker","Exile","Servant Golem","Free Golem","Hermit","Translocated Vet","Escaped Prisoner","Hotel Staff","SuperFriend","Space Syndicate","Ancient Crew","Space Doctor","Space Bartender","Beach Bum","Skeleton","Zombie","Space Bar Patron","Lavaland Syndicate","Ghost Role"), // Ghost roles
 	EXP_TYPE_GHOST = list() // dead people, observers
 ))

@@ -317,7 +317,11 @@
 
 //Returns a string with the first element of the string capitalized.
 /proc/capitalize(t as text)
-	return uppertext(copytext(t, 1, 2)) + copytext(t, 2)
+	return uppertext(copytext_char(t, 1, 2)) + copytext_char(t, 2)
+
+/proc/full_capitalize(input)
+	var/regex/first_letter = new(@"[^A-z]*?([A-z]*)", "g")
+	return replacetext(input, first_letter, /proc/capitalize)
 
 //Centers text by adding spaces to either side of the string.
 /proc/dd_centertext(message, length)
@@ -460,6 +464,16 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 			end = temp
 	return end
 
+// [SURREALIS-ADD] - PLASMA_OPTS
+/proc/cached_regex(pattern, flags)
+	var/static/list/compiled = list()
+	var/cache_key = "[flags]/[pattern]"
+	. = compiled[cache_key]
+	if(!.)
+		. = regex(pattern, flags)
+		compiled[cache_key] = .
+
+// [/SURREALIS-ADD]
 /proc/parsemarkdown_basic_step1(t, limited=FALSE, barebones=FALSE)
 	if(length(t) <= 0)
 		return
@@ -500,8 +514,15 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 	if(!limited)
 		t = replacetext(t, "((", "<font size=\"1\">")
 		t = replacetext(t, "))", "</font>")
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// SURREALIS-EDIT - ORIGINAL
+		/*
 		t = replacetext(t, regex("(-){3,}", "gm"), "<hr>")
 		t = replacetext(t, regex("^\\((-){3,}\\)$", "gm"), "$1")
+		*/
+		t = replacetext(t, cached_regex("(-){3,}", "gm"), "<hr>")
+		t = replacetext(t, cached_regex("^\\((-){3,}\\)$", "gm"), "$1")
+		// [/SURREALIS-EDIT]
 
 		// Parse lists
 
@@ -511,11 +532,21 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 		var/singlespace = -1 // if 0, double spaces are used before asterisks, if 1, single are
 		for(var/i = 1, i <= tlistlen, i++)
 			var/line = tlist[i]
+			// [SURREALIS-EDIT] - PLASMA_OPTS
+			// SURREALIS-EDIT - ORIGINAL
+			/*
 			var/count_asterisk = length(replacetext(line, regex("\[^\\*\]+", "g"), ""))
 			if(count_asterisk % 2 == 1 && findtext(line, regex("^\\s*\\*", "g"))) // there is an extra asterisk in the beggining
 
 				var/count_w = length(replacetext(line, regex("^( *)\\*.*$", "g"), "$1")) // whitespace before asterisk
 				line = replacetext(line, regex("^ *(\\*.*)$", "g"), "$1")
+			*/
+			var/count_asterisk = length(replacetext(line, cached_regex("\[^\\*\]+", "g"), ""))
+			if(count_asterisk % 2 == 1 && findtext(line, regex("^\\s*\\*", "g"))) // there is an extra asterisk in the beggining
+
+				var/count_w = length(replacetext(line, cached_regex("^( *)\\*.*$", "g"), "$1")) // whitespace before asterisk
+				line = replacetext(line, cached_regex("^ *(\\*.*)$", "g"), "$1")
+			// [/SURREALIS-EDIT]
 
 				if(singlespace == -1 && count_w == 2)
 					if(listlevel == 0)
@@ -526,7 +557,10 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 				if(singlespace == 0)
 					count_w = count_w % 2 ? round(count_w / 2 + 0.25) : count_w / 2
 
-				line = replacetext(line, regex("\\*", ""), "<li>")
+				// [SURREALIS-EDIT] - PLASMA_OPTS
+				// line = replacetext(line, regex("\\*", ""), "<li>") // SURREALIS-EDIT - ORIGINAL
+				line = replacetext(line, cached_regex("\\*", ""), "<li>")
+				// [/SURREALIS-EDIT]
 				while(listlevel < count_w)
 					line = "<ul>" + line
 					listlevel++
@@ -555,14 +589,26 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 
 	// Parse headers
 	if(!barebones)
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// SURREALIS-EDIT - ORIGINAL
+		/*
 		t = replacetext(t, regex("^#(?!#) ?(.+)$", "gm"), "<h2>$1</h2>")
 		t = replacetext(t, regex("^##(?!#) ?(.+)$", "gm"), "<h3>$1</h3>")
 		t = replacetext(t, regex("^###(?!#) ?(.+)$", "gm"), "<h4>$1</h4>")
 		t = replacetext(t, regex("^#### ?(.+)$", "gm"), "<h5>$1</h5>")
+		*/
+		t = replacetext(t, cached_regex("^#(?!#) ?(.+)$", "gm"), "<h2>$1</h2>")
+		t = replacetext(t, cached_regex("^##(?!#) ?(.+)$", "gm"), "<h3>$1</h3>")
+		t = replacetext(t, cached_regex("^###(?!#) ?(.+)$", "gm"), "<h4>$1</h4>")
+		t = replacetext(t, cached_regex("^#### ?(.+)$", "gm"), "<h5>$1</h5>")
+		// [/SURREALIS-EDIT]
 
 	// Parse most rules
 
 	if(!barebones)	//Barebones swaps * for + and | for bold and italics respectively, used in say / emote code, mostly.
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// SURREALIS-EDIT - ORIGINAL
+		/*
 		t = replacetext(t, regex("\\*(\[^\\*\]*)\\*", "g"), "<i>$1</i>")
 		t = replacetext(t, regex("_(\[^_\]*)_", "g"), "<i>$1</i>")
 		t = replacetext(t, "<i></i>", "!")
@@ -575,6 +621,20 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 		t = replacetext(t, regex("\\+(\[^\\+\]+)\\+", "g"), "<b>$1</b>")
 		t = replacetext(t, regex("\\|(\[^\\|\]+)\\|", "g"), "<i>$1</i>")
 		t = replacetext(t, regex("\\_(\[^\\_\]+)\\_", "g"), "<u>$1</u>")
+		*/
+		t = replacetext(t, cached_regex("\\*(\[^\\*\]*)\\*", "g"), "<i>$1</i>")
+		t = replacetext(t, cached_regex("_(\[^_\]*)_", "g"), "<i>$1</i>")
+		t = replacetext(t, "<i></i>", "!")
+		t = replacetext(t, "</i><i>", "!")
+		t = replacetext(t, cached_regex("\\!(\[^\\!\]+)\\!", "g"), "<b>$1</b>")
+		t = replacetext(t, cached_regex("\\^(\[^\\^\]+)\\^", "g"), "<font size=\"4\">$1</font>")
+		t = replacetext(t, cached_regex("\\|(\[^\\|\]+)\\|", "g"), "<center>$1</center>")
+		t = replacetext(t, "!", "</i><i>")
+	else
+		t = replacetext(t, cached_regex("\\+(\[^\\+\]+)\\+", "g"), "<b>$1</b>")
+		t = replacetext(t, cached_regex("\\|(\[^\\|\]+)\\|", "g"), "<i>$1</i>")
+		t = replacetext(t, cached_regex("\\_(\[^\\_\]+)\\_", "g"), "<u>$1</u>")
+		// [/SURREALIS-EDIT]
 
 	return t
 
@@ -602,7 +662,10 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 
 	if(hyperlink)
 
-		t = replacetext(t, regex(@"https?:\/\/[^\s$.?#].[^\s]*", "gi"), "<a href=\"$0\">$0</a>")
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// t = replacetext(t, regex(@"https?:\/\/[^\s$.?#].[^\s]*", "gi"), "<a href=\"$0\">$0</a>") // SURREALIS-EDIT - ORIGINAL
+		t = replacetext(t, cached_regex(@"https?:\/\/[^\s$.?#].[^\s]*", "gi"), "<a href=\"$0\">$0</a>")
+		// [/SURREALIS-EDIT]
 
 	return t
 
@@ -617,18 +680,31 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 
 	// Premanage whitespace
 
-	t = replacetext(t, regex("\[^\\S\\r\\n \]", "g"), "	")
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// t = replacetext(t, regex("\[^\\S\\r\\n \]", "g"), "	") // SURREALIS-EDIT - ORIGINAL
+	t = replacetext(t, cached_regex("\[^\\S\\r\\n \]", "g"), "	")
+	// [/SURREALIS-EDIT]
 
 	t = parsemarkdown_basic_step1(t)
 
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	t = replacetext(t, regex("%s(?:ign)?(?=\\s|$)", "igm"), user ? "<font face=\"[SIGNFONT]\" size=\"5\"><i>[user.real_name]</i></font>" : "<span class=\"paper_field\"></span>")
 	t = replacetext(t, regex("%f(?:ield)?(?=\\s|$)", "igm"), "<span class=\"paper_field\"></span>")
+	*/
+	t = replacetext(t, cached_regex("%s(?:ign)?(?=\\s|$)", "igm"), user ? "<font face=\"[SIGNFONT]\" size=\"5\"><i>[user.real_name]</i></font>" : "<span class=\"paper_field\"></span>")
+	t = replacetext(t, cached_regex("%f(?:ield)?(?=\\s|$)", "igm"), "<span class=\"paper_field\"></span>")
+	// [/SURREALIS-EDIT]
 
 	t = parsemarkdown_basic_step2(t)
 
 	// Manage whitespace
 
-	t = replacetext(t, regex("(?:\\r\\n?|\\n)", "g"), "<br>")
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// t = replacetext(t, regex("(?:\\r\\n?|\\n)", "g"), "<br>") // SURREALIS-EDIT - ORIGINAL
+	t = replacetext(t, cached_regex("(?:\\r\\n?|\\n)", "g"), "<br>")
+	// [/SURREALIS-EDIT]
 
 	t = replacetext(t, "	", "&nbsp;&nbsp;")
 
@@ -1048,3 +1124,70 @@ GLOBAL_LIST_INIT(binary, list("0","1"))
 		text2num(semver_regex.group[2]),
 		text2num(semver_regex.group[3]),
 	)
+
+/// Maps accented Latin letters (the 192 to 383 range that reject_bad_name allows) to their plain equivalents.
+GLOBAL_LIST_INIT(diacritic_map, init_diacritic_map())
+
+/proc/init_diacritic_map()
+	var/list/map = list()
+	var/list/groups = list(
+		"A" = "ÀÁÂÃÄÅĀĂĄ",
+		"a" = "àáâãäåāăą",
+		"C" = "ÇĆĈĊČ",
+		"c" = "çćĉċč",
+		"D" = "ĎĐ",
+		"d" = "ďđ",
+		"E" = "ÈÉÊËĒĔĖĘĚ",
+		"e" = "èéêëēĕėęě",
+		"G" = "ĜĞĠĢ",
+		"g" = "ĝğġģ",
+		"H" = "ĤĦ",
+		"h" = "ĥħ",
+		"I" = "ÌÍÎÏĨĪĬĮİ",
+		"i" = "ìíîïĩīĭįı",
+		"J" = "Ĵ",
+		"j" = "ĵ",
+		"K" = "Ķ",
+		"k" = "ķ",
+		"L" = "ĹĻĽĿŁ",
+		"l" = "ĺļľŀł",
+		"N" = "ÑŃŅŇ",
+		"n" = "ñńņň",
+		"O" = "ÒÓÔÕÖØŌŎŐ",
+		"o" = "òóôõöøōŏő",
+		"R" = "ŔŖŘ",
+		"r" = "ŕŗř",
+		"S" = "ŚŜŞŠ",
+		"s" = "śŝşš",
+		"T" = "ŢŤŦ",
+		"t" = "ţťŧ",
+		"U" = "ÙÚÛÜŨŪŬŮŰŲ",
+		"u" = "ùúûüũūŭůűų",
+		"W" = "Ŵ",
+		"w" = "ŵ",
+		"Y" = "ÝŶŸ",
+		"y" = "ýÿŷ",
+		"Z" = "ŹŻŽ",
+		"z" = "źżž"
+	)
+	for(var/plain in groups)
+		var/accented = groups[plain]
+		for(var/i in 1 to length_char(accented))
+			map[copytext_char(accented, i, i + 1)] = plain
+	map["Æ"] = "AE"
+	map["æ"] = "ae"
+	map["Œ"] = "OE"
+	map["œ"] = "oe"
+	map["ß"] = "ss"
+	return map
+
+/// Replaces accented letters with their plain equivalents, so names can be compared without diacritics.
+/proc/strip_diacritics(text)
+	if(!text)
+		return text
+	var/list/map = GLOB.diacritic_map
+	var/out = ""
+	for(var/i in 1 to length_char(text))
+		var/char = copytext_char(text, i, i + 1)
+		out += map[char] || char
+	return out

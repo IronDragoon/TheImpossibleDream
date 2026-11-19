@@ -63,8 +63,8 @@
 		if(ishuman(H))
 			var/mob/living/carbon/human/Hu = H
 			Hu.adjust_hydration(8)
-			if(HAS_TRAIT(Hu, TRAIT_BLACKBLOOD))
-				Hu.reagents.add_reagent(/datum/reagent/medicine/healthpot/zarum/blood, 0.5) // this is a fraction of a fraction in the end, I didn't heal too much from local tests, it's more for situations where you don't have food in pve
+		return
+	if(HAS_TRAIT(H, TRAIT_SANGUIVORE))
 		return
 	H.add_nausea(12)
 	H.adjustToxLoss(2)
@@ -78,6 +78,8 @@
 		if(ishuman(H))
 			var/mob/living/carbon/human/Hu = H
 			Hu.adjust_hydration(12) // hydrates, but does not restore blood nor has any other special effect
+		return
+	if(HAS_TRAIT(H, TRAIT_SANGUIVORE))
 		return
 	H.add_nausea(18) //Do not drink dirty blood!
 	H.adjustToxLoss(4)
@@ -379,7 +381,10 @@
 	if(!istype(M))
 		return
 	if(method == TOUCH)
-		M.adjustFireLoss(2, 0) // burns
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// M.adjustFireLoss(2, 0) // burns // SURREALIS-EDIT - ORIGINAL
+		M.adjustFireLoss(2, TRUE) // burns
+		// [/SURREALIS-EDIT]
 	..()
 
 /datum/reagent/fuel/unholywater		//if you somehow managed to extract this from someone, dont splash it on myself and have a smoke
@@ -411,7 +416,10 @@
 	M.adjust_fire_stacks(5)
 	M.ignite_mob()			//Only problem with igniting people is currently the commonly availible fire suits make you immune to being on fire
 	M.adjustToxLoss(1, 0)
-	M.adjustFireLoss(1, 0)		//Hence the other damages... ain't I a bastard?
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// M.adjustFireLoss(1, 0)		//Hence the other damages... ain't I a bastard? // SURREALIS-EDIT - ORIGINAL
+	M.adjustFireLoss(1, TRUE)		//Hence the other damages... ain't I a bastard?
+	// [/SURREALIS-EDIT]
 	M.adjustOrganLoss(ORGAN_SLOT_BRAIN, 5, 150)
 	holder.remove_reagent(type, 1)
 
@@ -1260,7 +1268,10 @@
 	if(!istype(M))
 		return
 	if(method == TOUCH)
-		M.adjustFireLoss(2, FALSE) // burns,
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// M.adjustFireLoss(2, FALSE) // burns, // SURREALIS-EDIT - ORIGINAL
+		M.adjustFireLoss(2, TRUE) // burns,
+		// [/SURREALIS-EDIT]
 		M.adjust_fire_stacks((reac_volume / 10))
 	..()
 

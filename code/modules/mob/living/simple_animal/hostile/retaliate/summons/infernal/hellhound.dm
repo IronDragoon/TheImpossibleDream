@@ -9,7 +9,10 @@
 	icon_state = "hellhound"
 	icon_living = "hellhound"
 	icon_dead = "vvd"
-	summon_primer = "You are a hellhound, a moderate sized canine made of heat and flame. You spend time in the infernal plane hunting and incinerating things to your hearts content. Now you've been pulled from your home into a new world, that is decidedly lacking in fire. How you react to these events, only time can tell."
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// summon_primer = "You are a hellhound, a moderate sized canine made of heat and flame. You spend time in the infernal plane hunting and incinerating things to your hearts content. Now you've been pulled from your home into a new world, that is decidedly lacking in fire. How you react to these events, only time can tell." // SURREALIS-EDIT - ORIGINAL
+	summon_primer = "You are a hellhound, a moderate sized canine made of heat and flame. You spend time in the infernal plane hunting and incinerating things to your heart's content. Now you've been pulled from your home into a new world, that is decidedly lacking in fire. How you react to these events, only time can tell."
+	// [/SURREALIS-EDIT]
 	summon_tier = 2
 	gender = MALE
 	emote_hear = null
@@ -18,7 +21,7 @@
 	turns_per_move = 6
 	see_in_dark = 6
 	move_to_delay = 3
-	base_intents = list(/datum/intent/simple/bite)
+	base_intents = list(/datum/intent/simple/bite/hellhound)
 	butcher_results = list()
 	death_loot = list(/obj/item/magic/infernal/fang = 2)
 	faction = list(FACTION_INFERNAL)
@@ -49,7 +52,7 @@
 	dodgetime = 30
 	aggressive = 1
 
-	ai_controller = /datum/ai_controller/infernal/hound
+	ai_controller = /datum/ai_controller/infernal
 	move_base_delay = MOVEMENT_DELAY_SPD_17
 
 	var/scorch_cooldown = 10 SECONDS
@@ -71,3 +74,6 @@
 	var/mob/living/seared = target
 	apply_scorch_stack(seared, 1)
 	seared.visible_message(span_danger("[src] sears [seared] with hellfire!"))
+
+/datum/intent/simple/bite/hellhound
+	clickcd = HELLHOUND_ATTACK_SPEED

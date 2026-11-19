@@ -119,7 +119,7 @@
 		var/healing = -0.2
 		if((locate(/obj/structure/bed) in owner.loc))
 			healing -= 0.3
-		else if((locate(/obj/structure/table) in owner.loc))
+		else if(has_table_surface(owner.loc))
 			healing -= 0.1
 		for(var/obj/item/bedsheet/bedsheet in range(owner.loc,0))
 			if(bedsheet.loc != owner.loc) //bedsheets in my backpack/neck don't give you comfort
@@ -242,6 +242,9 @@
 	playsound(T, "desceration", 100, TRUE, -1)
 
 /datum/status_effect/neck_slice
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "neck_slice"
 	status_type = STATUS_EFFECT_UNIQUE
 	alert_type = null
@@ -310,6 +313,9 @@
 	qdel(src)
 
 /datum/status_effect/spasms
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "spasms"
 	status_type = STATUS_EFFECT_MULTIPLE
 	alert_type = null
@@ -481,6 +487,9 @@
 	icon_state = "mind_control"
 
 /datum/status_effect/debuff/mishap_feeblemind
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "feeblemind"
 	duration = 7 MINUTES // This effect is really nasty but is deliberately one of the worst mishap effects, so it has a fairly long duration.
 	status_type = STATUS_EFFECT_REFRESH
@@ -537,6 +546,9 @@
 	icon_state = "high"
 
 /datum/status_effect/debuff/mishap_arcane_high
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "arcane_high"
 	duration = 5 MINUTES
 	status_type = STATUS_EFFECT_REFRESH
@@ -572,6 +584,9 @@
 	icon_state = "drunk"
 
 /datum/status_effect/debuff/mishap_arcane_drunkenness
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "arcane_drunk"
 	duration = 10 MINUTES // Drunkenness we add is forcibly removed on expiry
 	status_type = STATUS_EFFECT_REFRESH
@@ -657,6 +672,9 @@
 	icon_state = "blind"
 
 /datum/status_effect/debuff/mishap_blindness
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "arcane_blindness"
 	duration = 2 MINUTES // Another nasty effect - victim will need to be led around until it expires.
 	status_type = STATUS_EFFECT_REFRESH
@@ -683,6 +701,9 @@
 	icon_state = "hypnosis"
 
 /datum/status_effect/debuff/mishap_sleepy
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "arcane_sleep"
 	duration = 15 SECONDS // Sleep amount is 60 seconds, so effectively ~75 seconds. User is completely incapacitated so this shouldn't be too long.
 	status_type = STATUS_EFFECT_REFRESH
@@ -708,6 +729,9 @@
 	icon_state = "mind_control"
 
 /datum/status_effect/debuff/mishap_confused
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "arcane_confusion"
 	duration = 5 MINUTES
 	status_type = STATUS_EFFECT_REFRESH
@@ -820,41 +844,6 @@
 	mob_effect_layer = MOB_EFFECT_LAYER_EXPOSED
 
 /datum/status_effect/debuff/exposed/on_creation(mob/living/new_owner, new_dur)
-	if(new_dur)
-		duration = new_dur
-	return ..()
-
-/datum/status_effect/debuff/exposed/on_apply()
-	. = ..()
-	lock_casting(duration)
-
-/datum/status_effect/debuff/exposed/refresh(mob/living/new_owner, new_dur)
-	. = ..()
-	lock_casting(new_dur || initial(duration))
-
-/datum/status_effect/debuff/exposed/proc/lock_casting(lock_dur)
-	if(!owner)
-		return
-	lock_dur = min(lock_dur, EXPOSED_CAST_LOCKOUT)
-	var/datum/status_effect/debuff/cast_disrupted/existing = owner.has_status_effect(/datum/status_effect/debuff/cast_disrupted)
-	if(existing)
-		existing.duration = max(existing.duration, world.time + lock_dur)
-		return
-	owner.apply_status_effect(/datum/status_effect/debuff/cast_disrupted, lock_dur)
-
-/atom/movable/screen/alert/status_effect/debuff/cast_disrupted
-	name = "Casting Disrupted"
-	desc = "My concentration is broken. I cannot gather magicka until I recover."
-	icon = 'icons/mob/screen_alert_combat.dmi'
-	icon_state = "castdisrupted"
-
-/datum/status_effect/debuff/cast_disrupted
-	id = "cast_disrupted"
-	alert_type = /atom/movable/screen/alert/status_effect/debuff/cast_disrupted
-	duration = EXPOSED_CAST_LOCKOUT
-	status_type = STATUS_EFFECT_UNIQUE
-
-/datum/status_effect/debuff/cast_disrupted/on_creation(mob/living/new_owner, new_dur)
 	if(new_dur)
 		duration = new_dur
 	return ..()

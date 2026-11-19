@@ -38,6 +38,13 @@
 			footstep_sounds = 'sound/blank.ogg'
 	RegisterSignal(parent, list(COMSIG_MOVABLE_MOVED), PROC_REF(play_simplestep)) //Note that this doesn't get called for humans.
 
+// [SURREALIS-ADD] - PLASMA_OPTS
+/datum/component/footstep/proc/reset_steps()
+	steps = 0
+	last_sound = null
+	clear_prints()
+
+// [/SURREALIS-ADD]
 /datum/component/footstep/Destroy(force, silent)
 	clear_prints()
 	return ..()
@@ -145,7 +152,7 @@
 			override_sound = TRUE
 		if(override_sound)
 			used_sound = 'sound/blank.ogg'
-		if(RSTL)
+		if(RSTL && (humshoes.stepnoise_flag & STEPNOISE_HEELS))
 			RSTL.set_override(override_sound ? FALSE : TRUE)
 
 	var/list/heard = playsound(step_location, used_sound,

@@ -459,6 +459,9 @@
 		render_stash_colormasks = null
 		masks_dir = null
 		active_masks = null
+		// [SURREALIS-ADD] - PLASMA_OPTS
+		mannequin.flush_visuals()
+		// [/SURREALIS-ADD]
 		cached_icon = hair_preview_icon(mannequin, preview_dir)
 		unset_busy_human_dummy(DUMMY_HUMAN_SLOT_PREFERENCES)
 	if(cached_icon)

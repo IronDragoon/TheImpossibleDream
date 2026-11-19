@@ -49,11 +49,6 @@
 	path = /obj/item/clothing/shoes/roguetown/simpleshoes/heels/donator_silver
 	sort_category = "Shoes"
 
-/datum/loadout_item/mortosasye_deepcutdress
-	name = "Deep Cut Dress"
-	path = /obj/item/clothing/suit/roguetown/shirt/dress/silkdress/donator_mortosasye_deepcutdress
-	sort_category = "Shirts"
-
 /datum/loadout_item/eastdobodecorated
 	name = "Decorated Dōbō Robe"
 	path = /obj/item/clothing/suit/roguetown/armor/basiceast/crafteast/loadout
@@ -159,6 +154,17 @@
 	sort_category = "Accessories"
 
 
+/datum/loadout_item/captain_robe
+	name = "Captain's Robe"
+	path = /obj/item/clothing/suit/roguetown/shirt/dress/captainrobe/loadout
+	sort_category = "Shirts"
+
+
+/datum/loadout_item/kazegun_cloak
+	name = "Eastern Cloak"
+	path = /obj/item/clothing/cloak/eastcloak1
+	sort_category = "Cloaks"
+
 // TRIUMPH COST OVERRIDES
 
 /datum/loadout_item/paper_parasol
@@ -199,3 +205,7 @@
 
 /datum/loadout_item/mirror
 	triumph_cost = 0
+
+//cost over-ride
+/obj/item/clothing/suit/roguetown/shirt/dress/captainrobe/loadout
+	sellprice = 0

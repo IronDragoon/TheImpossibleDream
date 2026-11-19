@@ -1,4 +1,8 @@
 /mob/living/carbon/human
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	var/descriptor_name_key
+	var/descriptor_name_cache
+	// [/SURREALIS-ADD]
 	name = "Unknown"
 	real_name = "Unknown"
 	icon = 'icons/mob/human.dmi'
@@ -125,6 +129,8 @@
 	var/headshot_artist_link = null
 	var/standard_headshot_link = null //used to store headshots when swapping for antag ones
 	var/flavortext = null
+	/// Hermes signature. We keep it static per round to minimize meta potential or "HERETICS AT FORT" pen name situation
+	var/pen_name = null
 	/// For setpose
 	var/pose_text = ""
 	var/ooc_notes = null

@@ -16,6 +16,9 @@
 	var/obj/item/organ/penis/preview_penis = mannequin.getorganslot(ORGAN_SLOT_PENIS)
 	if(preview_penis)
 		preview_penis.update_erect_state(preview_boner_state)
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	mannequin.flush_visuals()
+	// [/SURREALIS-ADD]
 	return mannequin.appearance
 
 /datum/preferences/proc/cycle_boner_preview()

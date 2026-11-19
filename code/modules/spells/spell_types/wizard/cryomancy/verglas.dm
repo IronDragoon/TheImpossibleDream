@@ -27,7 +27,7 @@
 	charge_required = TRUE
 	weapon_cast_penalized = TRUE
 	charge_time = CHARGETIME_MAJOR
-	charge_swingdelay_type = SWINGDELAY_CANCEL
+	charge_swingdelay_type = SWINGDELAY_PENALTY
 	hold_drain = 1
 	charge_slowdown = CHARGING_SLOWDOWN_MEDIUM
 	charge_sound = 'sound/magic/charging.ogg'
@@ -250,6 +250,11 @@
 	desc = "I am concentrating to hold the verglas in place. A single blow or casting another spell will shatter it."
 	icon_state = "debuff"
 
+// [SURREALIS-ADD] - PLASMA_OPTS
+/datum/status_effect/verglas_concentration/skate
+	tick_interval = 1 SECONDS
+
+// [/SURREALIS-ADD]
 /datum/status_effect/verglas_concentration/skate/on_apply()
 	. = ..()
 	RegisterSignal(owner, COMSIG_MOVABLE_TURF_ENTERED, PROC_REF(on_enter))

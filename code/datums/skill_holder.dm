@@ -99,6 +99,14 @@
 	// may simultaneously be someone's trade apprentice and a Knight's protégé.
 	var/mob/living/carbon/human/knight_lord = null
 	var/mob/living/carbon/human/my_squire = null
+	/// Last crafting recipe attempted by this holder
+	var/datum/crafting_recipe/last_recipe = null
+	/// Current pseudorandomized craft chance float
+	var/pseudo_craft_chance = 0
+	/// Counter of low skill failures. Reset upon failure, if higher than 10, can cause crafting failures.
+	var/craft_failure_count = 0
+	/// Counter of how many times a failure has causes materials to be wasted. Used to enforce a pity mechanic where failing becomes less likely the higher this number is.
+	var/craft_waste_count = 0
 
 /datum/skill_holder/New()
 	. = ..()
@@ -280,7 +288,11 @@
 /datum/skill_holder/proc/get_skill_level(skill)
 	var/datum/skill/S = GetSkillRef(skill)
 	var/modifier = 0
-	if(S?.abstract_type in list(/datum/skill/labor, /datum/skill/craft))
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// if(S?.abstract_type in list(/datum/skill/labor, /datum/skill/craft)) // SURREALIS-EDIT - ORIGINAL
+	var/static/list/inspired_skill_types = list(/datum/skill/labor, /datum/skill/craft)
+	if(S?.abstract_type in inspired_skill_types)
+	// [/SURREALIS-EDIT]
 		modifier = current?.get_inspirational_bonus()
 	if(!(S in known_skills))
 		return SKILL_LEVEL_NONE
@@ -360,9 +372,9 @@
 
 		// Progress column
 		var/progress_col
-		if(is_capped)
+		if(is_capped || (HAS_TRAIT(current, TRAIT_COMBAT_JMAN) && skill_level == SKILL_LEVEL_JOURNEYMAN))
 			progress_col = "<b style='color: #cc3333;'>CAPPED</b>"
-		else if(is_legendary)
+		else if(is_legendary || (HAS_TRAIT(current, TRAIT_NOSHIELDS) && istype(i, /datum/skill/combat/shields)))
 			progress_col = "<span style='color: #555555;'>---</span>"
 		else
 			var/percent = 0
@@ -405,3 +417,7 @@
 		var/datum/stressevent/event = stressors[event_type]
 		bonus += event.quality_modifier
 	return bonus
+
+/datum/skill_holder/proc/reset_pseudo_chance()
+	pseudo_craft_chance = 0
+	last_recipe = null

@@ -31,7 +31,7 @@
 		return 1
 	if(mover.throwing)
 		return 1
-	if(locate(/obj/structure/table) in get_turf(mover))
+	if(has_table_surface(get_turf(mover)))
 		return 1
 	return !density
 
@@ -161,6 +161,20 @@
 		burn_out()
 		return TRUE
 	return ..()
+
+/obj/machinery/light/rogue/campfire/fireplace/OnCrafted(dirin)
+	pixel_x = 0
+	pixel_y = 0
+	switch(dirin)
+		if(NORTH)
+			pixel_y = 32
+		if(SOUTH)
+			pixel_y = -32
+		if(EAST)
+			pixel_x = 32
+		if(WEST)
+			pixel_x = -32
+	. = ..()
 
 /obj/machinery/light/rogue/candle
 	name = "candles"
@@ -481,7 +495,7 @@
 		return 1
 	if(mover.throwing)
 		return 1
-	if(locate(/obj/structure/table) in get_turf(mover))
+	if(has_table_surface(get_turf(mover)))
 		return 1
 	else
 		return !density
@@ -502,7 +516,7 @@
 
 /obj/machinery/light/rogue/hearth/attack_right(mob/user)
 	var/datum/skill/craft/cooking/cs = user?.get_skill_level(/datum/skill/craft/cooking)
-	var/cooktime_divisor = get_cooktime_divisor(cs)
+	var/cooktime_divisor = get_skill_speed_divisor(cs)
 	var/fan_time = 2 SECONDS / cooktime_divisor
 	if(!on)
 		to_chat(user, span_notice("[src] is not lit."))
@@ -556,6 +570,9 @@
 //////////////////////////////////
 
 /obj/machinery/light/rogue/hearth/update_icon()
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	cut_overlays()
 	icon_state = "[base_state][on]"
 	if(attachment)
@@ -564,6 +581,21 @@
 			I.pixel_x = 0
 			I.pixel_y = 0
 			add_overlay(new /mutable_appearance(I))
+	*/
+	icon_state = "[base_state][on]"
+	var/obj/item/shown_item
+	if(attachment)
+		if(istype(attachment, /obj/item/cooking/pan) || istype(attachment, /obj/item/reagent_containers/glass/bucket/pot))
+			shown_item = attachment
+			shown_item.pixel_x = 0
+			shown_item.pixel_y = 0
+	if(attachment_overlay_current(shown_item))
+		return
+	cut_overlays()
+	if(shown_item)
+		add_overlay(new /mutable_appearance(shown_item))
+	remember_attachment_overlay(shown_item)
+	// [/SURREALIS-EDIT]
 
 /obj/machinery/light/rogue/hearth/MouseDrop(mob/over, src_location, over_location, src_control, over_control, params)
 	. = ..()
@@ -790,7 +822,7 @@
 
 /obj/machinery/light/rogue/campfire/attack_right(mob/user)
 	var/datum/skill/craft/cooking/cs = user?.get_skill_level(/datum/skill/craft/cooking)
-	var/cooktime_divisor = get_cooktime_divisor(cs)
+	var/cooktime_divisor = get_skill_speed_divisor(cs)
 	var/fan_time = 2 SECONDS / cooktime_divisor
 	if(!on)
 		to_chat(user, span_notice("[src] is not lit."))
@@ -922,16 +954,32 @@
 
 /obj/machinery/light/rogue/campfire/update_icon()
 	. = ..()
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	cut_overlays()
 	if(attachment)
 		var/obj/item/I = attachment
 		I.pixel_x = 0
 		I.pixel_y = 0
+	*/
+	var/obj/item/I = attachment
+	if(I)
+		I.pixel_x = 0
+		I.pixel_y = 0
+	if(attachment_overlay_current(I))
+		return
+	cut_overlays()
+	if(I)
+	// [/SURREALIS-EDIT]
 		var/mutable_appearance/MA = new /mutable_appearance(I)
 		MA.transform *= 0.85
 		MA.pixel_y = -6
 		MA.layer = layer + 0.1
 		add_overlay(MA)
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	remember_attachment_overlay(I)
+	// [/SURREALIS-ADD]
 
 /obj/machinery/light/rogue/campfire/onkick(mob/user)
 	if(isliving(user) && on)
@@ -959,7 +1007,7 @@
 		return 1
 	if(mover.throwing)
 		return 1
-	if(locate(/obj/structure/table) in get_turf(mover))
+	if(has_table_surface(get_turf(mover)))
 		return 1
 	if(locate(/obj/machinery/light/rogue/firebowl) in get_turf(mover))
 		return 1

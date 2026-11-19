@@ -65,6 +65,11 @@
 	if(!target.revive_check(owner))
 		return FALSE
 
+	var/mob/dead/observer/underworld_spirit = target.get_spirit()
+	if(alert(underworld_spirit || target, "They are calling for you. Are you ready?", "Revival", "I need to wake up", "Don't let me go") != "I need to wake up")
+		target.visible_message(span_astrata("Nothing happens. They are not being let go."))
+		return FALSE
+
 	var/is_matthios = istype(found_cross, /obj/structure/fluff/psycross/matthios)
 	var/is_astrata = istype(found_cross, /obj/structure/fluff/psycross/astrata)
 
@@ -111,12 +116,6 @@
 	if(!target.revive(full_heal = FALSE))
 		to_chat(owner, span_warning("Nothing happens."))
 		return FALSE
-
-	var/mob/living/carbon/spirit/underworld_spirit = target.get_spirit()
-	if(underworld_spirit)
-		var/mob/dead/observer/ghost = underworld_spirit.ghostize()
-		qdel(underworld_spirit)
-		ghost.mind.transfer_to(target, TRUE)
 
 	target.grab_ghost(force = TRUE)
 	target.emote("breathgasp")
@@ -321,8 +320,7 @@
 	name = "primal rift"
 	desc = "A jagged tear in reality smelling of blood."
 	icon = 'icons/roguetown/misc/structure.dmi'
-	icon_state = "shitportal"
-	color = "#570f04"
+	icon_state = "graggarportal"
 	anchored = TRUE
 	density = FALSE
 	max_integrity = 600
@@ -339,6 +337,9 @@
 /obj/structure/primal_rift/Initialize(mapload)
 	. = ..()
 	spawn_orcs()
+	set_light(3, 2, 20, l_color = "#c03030")
+	playsound(loc, 'sound/misc/portalopen.ogg', 100, FALSE, pressure_affected = FALSE)
+	new /obj/effect/temp_visual/kinetic_blast(get_turf(src))
 
 	// Auto-delete after 15 minutes
 	addtimer(CALLBACK(src, PROC_REF(expire)), lifetime)
@@ -502,6 +503,9 @@
 	desc = span_userdanger("Everything is loud and grey. Where is the dust?!")
 
 /datum/status_effect/debuff/baotha_addiction
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "baotha_addiction"
 	duration = 15 MINUTES
 	alert_type = /atom/movable/screen/alert/status_effect/baotha_addiction
@@ -681,7 +685,10 @@
 		return
 	var/very_hongry = pick("HUNGRY...", "Hungry...", "Hungry! Hungry!",	"I NEED TO EAT!", "I'm STARVING!!", "Need to eat... anything... I'll eat anything. I'm so hungry.")
 	if(H.nutrition >= NUTRITION_LEVEL_FED)
-		duration -= 5 MINUTES
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// duration -= 5 MINUTES // SURREALIS-EDIT - ORIGINAL
+		set_expires_at(expires_at - 5 MINUTES)
+		// [/SURREALIS-EDIT]
 		to_chat(owner, span_warning("You feel some of your Lux react to being full... your reserves drain rapidly and your stomach quickly empties."))
 		to_chat(owner, span_green("I am recovering faster..."))
 

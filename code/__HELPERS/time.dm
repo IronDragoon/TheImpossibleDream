@@ -160,7 +160,7 @@ GLOBAL_VAR_INIT(date_override_offset, 0)
 				SStreasury.tick_burgher_pledge()
 				SStreasury.tick_rumor_points()
 				SStreasury.tick_loans()
-				SStreasury.tick_poll_tax()
+				SStreasury.tick_poll_levy_arrears()
 			SScity_assembly?.on_day_tick()
 		for(var/mob/living/player in GLOB.mob_list)
 			if(player.stat != DEAD && player.client)
@@ -260,8 +260,16 @@ GLOBAL_VAR_INIT(date_override_offset, 0)
 GLOBAL_VAR_INIT(midnight_rollovers, 0)
 GLOBAL_VAR_INIT(rollovercheck_last_timeofday, 0)
 /proc/update_midnight_rollover()
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	if (world.timeofday < GLOB.rollovercheck_last_timeofday) //TIME IS GOING BACKWARDS!
 		return GLOB.midnight_rollovers++
+	*/
+	if (world.timeofday < GLOB.rollovercheck_last_timeofday - (MIDNIGHT_ROLLOVER / 2)) //TIME IS GOING BACKWARDS!
+		GLOB.midnight_rollovers++
+	GLOB.rollovercheck_last_timeofday = world.timeofday
+	// [/SURREALIS-EDIT]
 	return GLOB.midnight_rollovers
 
 /proc/weekdayofthemonth()
@@ -280,6 +288,15 @@ GLOBAL_VAR_INIT(rollovercheck_last_timeofday, 0)
 
 //Takes a value of time in deciseconds.
 //Returns a text value of that number in hours, minutes, or seconds.
+// Return them in daes / hours, IC units
+/proc/station_duration_text(real_time)
+	var/station_time = real_time * SSticker.station_time_rate_multiplier
+	var/daes = round(station_time / (24 HOURS), 1)
+	if(daes >= 1)
+		return "[daes] dae[daes != 1 ? "s" : ""]"
+	var/hours = max(round(station_time / (1 HOURS), 1), 1)
+	return "[hours] hour[hours != 1 ? "s" : ""]"
+
 /proc/DisplayTimeText(time_value, round_seconds_to = 0.1)
 	var/second = FLOOR(time_value * 0.1, round_seconds_to)
 	if(!second)

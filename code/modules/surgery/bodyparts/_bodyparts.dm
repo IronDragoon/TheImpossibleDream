@@ -118,8 +118,7 @@
 
 /obj/item/bodypart/proc/get_specific_markings_overlays(list/specific_markings, aux = FALSE, mob/living/carbon/human/human_owner, override_color)
 	var/list/appearance_list = list()
-//	var/specific_layer = aux ? aux_layer : BODYPARTS_LAYER
-	var/specific_layer = aux_layer ? aux_layer : BODYPARTS_LAYER
+	var/specific_layer = (aux || aux_layer == LEG_PART_LAYER) ? aux_layer : BODYPARTS_LAYER
 	var/specific_render_zone = aux ? aux_zone : body_zone
 
 	for(var/key in specific_markings)
@@ -355,6 +354,11 @@
 
 	if(!brute && !burn && !stamina)
 		return FALSE
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	var/brute_was = brute_dam
+	var/burn_was = burn_dam
+	var/stamina_was = stamina_dam
+	// [/SURREALIS-ADD]
 	//cap at maxdamage
 	if(brute_dam + brute > max_damage)
 		brute_dam = max(brute_dam, max_damage)
@@ -377,12 +381,29 @@
 			else if((brute + burn) >= 20)
 				owner.flash_fullscreen("redflash3")
 
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	if(owner && updating_health)
 		owner.updatehealth()
 		if(stamina > DAMAGE_PRECISION)
 			owner.update_stamina()
 			owner.stam_regen_start_time = world.time + STAMINA_REGEN_BLOCK_TIME
 			. = TRUE
+	*/
+	var/health_changed = (brute_dam != brute_was || burn_dam != burn_was)
+	var/stamina_changed = (stamina_dam != stamina_was)
+	if(owner)
+		if(stamina > DAMAGE_PRECISION)
+			owner.stam_regen_start_time = world.time + STAMINA_REGEN_BLOCK_TIME
+		if(updating_health)
+			if(health_changed)
+				owner.updatehealth()
+			if(stamina_changed)
+				owner.update_stamina()
+	if(stamina_changed)
+		. = TRUE
+	// [/SURREALIS-EDIT]
 	consider_processing()
 	update_disabled()
 	. = update_bodypart_damage_state() || .
@@ -406,11 +427,22 @@
 		burn *= 1.3
 		stamina *= 1.3
 
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	var/brute_was = brute_dam
+	var/burn_was = burn_dam
+	var/stamina_was = stamina_dam
+	// [/SURREALIS-ADD]
 	brute_dam	= round(max(brute_dam - brute, 0), DAMAGE_PRECISION)
 	burn_dam	= round(max(burn_dam - burn, 0), DAMAGE_PRECISION)
 	stamina_dam = round(max(stamina_dam - stamina, 0), DAMAGE_PRECISION)
 	if(owner && updating_health)
-		owner.updatehealth()
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// owner.updatehealth() // SURREALIS-EDIT - ORIGINAL
+		if(brute_dam != brute_was || burn_dam != burn_was)
+			owner.updatehealth()
+		if(stamina_dam != stamina_was)
+			owner.update_stamina()
+		// [/SURREALIS-EDIT]
 	consider_processing()
 	update_disabled()
 	cremation_progress = min(0, cremation_progress - ((brute_dam + burn_dam)*(100/max_damage)))

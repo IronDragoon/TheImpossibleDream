@@ -464,7 +464,14 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 			return
 	if(footstep_type)
 		if(!QDELING(src))
-			AddComponent(/datum/component/footstep, footstep_type)
+			// [SURREALIS-EDIT] - PLASMA_OPTS
+			// AddComponent(/datum/component/footstep, footstep_type) // SURREALIS-EDIT - ORIGINAL
+			var/datum/component/footstep/footsteps = GetComponent(/datum/component/footstep)
+			if(footsteps && footsteps.footstep_type == footstep_type && footsteps.volume == 0.5 && footsteps.e_range == -1)
+				footsteps.reset_steps()
+			else
+				AddComponent(/datum/component/footstep, footstep_type)
+			// [/SURREALIS-EDIT]
 
 /mob/living/simple_animal/handle_status_effects()
 	..()
@@ -534,20 +541,6 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 		var/areatemp = cur_turf.temperature
 		if((areatemp < minbodytemp) || (areatemp > maxbodytemp))
 			. = FALSE
-
-
-/mob/living/simple_animal/handle_environment()
-	var/atom/A = src.loc
-	if(isturf(A))
-		//ATMO/TURF/TEMPERATURE
-		var/turf/cur_turf = A
-		var/areatemp = cur_turf.temperature
-		if( abs(areatemp - bodytemperature) > 5)
-			var/diff = areatemp - bodytemperature
-			diff = diff / 5
-			adjust_bodytemperature(diff)
-
-	handle_temperature_damage()
 
 /mob/living/simple_animal/proc/handle_temperature_damage()
 	if((bodytemperature < minbodytemp) || (bodytemperature > maxbodytemp))
@@ -698,7 +691,7 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 		to_chat(user, "<span class='notice'>I finish butchering: [butcher_summary(botch_count, normal_count, perfect_count, botch_chance, perfect_chance)].</span>")
 		if(user.mind)
 			user.mind.add_sleep_experience(/datum/skill/labor/butchering, user.STAINT * BUTCHERING_EXP_FINISH)
-		gib()
+		gib(leave_gibs = FALSE)
 
 /mob/living/simple_animal/proc/gib_with_novice_butchery()
 	var/atom/Tsec = drop_location()
@@ -765,13 +758,18 @@ GLOBAL_VAR_INIT(farm_animals, FALSE)
 /mob/living/simple_animal/spawn_dust(just_ash = FALSE)
 	if(just_ash || !remains_type)
 		for(var/i in 1 to 5)
-			new /obj/item/ash(loc)
+			new /obj/item/natural/ash(loc)
 	else
 		new remains_type(loc)
 
 /mob/living/simple_animal/gib_animation()
 	if(icon_gib)
 		new /obj/effect/temp_visual/gib_animation/animal(loc, icon_gib)
+
+/mob/living/simple_animal/spawn_gibs()
+	if(mob_size < MOB_SIZE_LARGE)
+		return ..()
+	new /obj/effect/gibspawner/beast(drop_location(), src)
 
 /mob/living/simple_animal/say_mod(input, message_mode)
 	if(speak_emote && speak_emote.len)

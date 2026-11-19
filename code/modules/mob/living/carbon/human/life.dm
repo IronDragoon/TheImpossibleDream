@@ -28,7 +28,7 @@
 
 	// Sleep gate: skip Life() for idle NPCs to save cycles, but only if fully conscious.
 	// If not conscious, we must run Life() so update_stat() can transition us back and re-wake the AI.
-	if(!client && stat == CONSCIOUS && ai_controller?.ai_status != AI_STATUS_ON)
+	if(!client && stat == CONSCIOUS && ai_controller && ai_controller.ai_status != AI_STATUS_ON)
 		return
 
 	. = ..()
@@ -59,7 +59,10 @@
 	//heart attack stuff
 	handle_heart()
 	update_energy()
-	update_stamina()
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// update_stamina() // SURREALIS-EDIT - ORIGINAL
+	handle_stamina_regen()
+	// [/SURREALIS-EDIT]
 	for(var/datum/charflaw/cf in charflaws)
 		if(!cf.ephemeral && mind)
 			cf.flaw_on_life(src)
@@ -108,10 +111,6 @@
 			if(gender == MALE)
 				has_stubble = TRUE
 				update_hair()
-
-/mob/living/carbon/human/handle_environment()
-
-	dna.species.handle_environment(src)
 
 /mob/living/carbon/human/proc/get_thermal_protection()
 	var/thermal_protection = 0 //Simple check to estimate how protected we are against multiple temperatures

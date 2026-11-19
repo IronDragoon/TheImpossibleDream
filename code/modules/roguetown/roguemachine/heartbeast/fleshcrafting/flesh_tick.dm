@@ -6,16 +6,8 @@
 	// Don't lower the size, they'll make effective throwing weapons otherwise.
 	w_class = WEIGHT_CLASS_NORMAL
 	isbait = TRUE
-	baitpenalty = 5
-	fishingMods=list(
-		"commonFishingMod" = 0.8,
-		"rareFishingMod" = 1.2,
-		"treasureFishingMod" = 0.5,
-		"trashFishingMod" = 1,
-		"dangerFishingMod" = 1.1,
-		"ceruleanFishingMod" = 0, // 1 on cerulean aril, 0 on everything else
-		"cheeseFishingMod" = 0 // Just for the funny gimmick of a chance for rats and rouses.
-	)
+	bait_quality = TRAIT_GOOD_QUALITY_BAIT
+	bait_flag = DISH_MEAT
 	baitresilience = 5
 	dropshrink = 0.85
 
@@ -26,17 +18,9 @@
 	desc = "This leechtick has feasted on lux and digested it. A crazy person might use this for revival..."
 	sellprice = 40
 	isbait = TRUE
-	baitpenalty = 0
-	fishingMods=list(
-		"commonFishingMod" = 0.65,
-		"rareFishingMod" = 1.35,
-		"treasureFishingMod" = 0.5,
-		"trashFishingMod" = 0.9,
-		"dangerFishingMod" = 1,
-		"ceruleanFishingMod" = 0, // 1 on cerulean aril, 0 on everything else
-		"cheeseFishingMod" = 0 // Just for the funny gimmick of a chance for rats and rouses.
-	)
-	baitresilience = 10
+	bait_quality = TRAIT_GREAT_QUALITY_BAIT
+	bait_flag = DISH_MEAT
+	baitresilience = 6
 
 /obj/item/leechtick/afterattack(atom/target, mob/user, proximity_flag, click_parameters)
 	. = ..()
@@ -178,7 +162,10 @@
 	var/mob/living/L = parent
 	if(prob(25))
 		to_chat(L, span_notice("The leech tick skitters across my body!"))
-	L.adjustBruteLoss(1, 0)
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// L.adjustBruteLoss(1, 0) // SURREALIS-EDIT - ORIGINAL
+	L.adjustBruteLoss(1, TRUE)
+	// [/SURREALIS-EDIT]
 	current_zone = pick(possible_zones)
 	update_overlay()
 	zone_switch_timer = addtimer(CALLBACK(src, PROC_REF(switch_zone)), rand(10, 40), TIMER_STOPPABLE)
@@ -252,6 +239,9 @@
 	desc = "You hear faint whispers that don't belong to you. Your mind feels maladjusted and unsettled."
 
 /datum/status_effect/debuff/leech_schizophrenia
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "leech_schizophrenia"
 	alert_type = /atom/movable/screen/alert/status_effect/debuff/leech_schizophrenia
 	duration = 10 SECONDS
@@ -271,7 +261,10 @@
 /datum/status_effect/debuff/leech_schizophrenia/on_creation(mob/living/new_owner, ...)
 	. = ..()
 
-	duration = rand(14 MINUTES, 28 MINUTES)
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// duration = rand(14 MINUTES, 28 MINUTES) // SURREALIS-EDIT - ORIGINAL
+	set_expires_at(world.time + rand(14 MINUTES, 28 MINUTES))
+	// [/SURREALIS-EDIT]
 	current_cooldown = world.time + message_cooldown
 	return .
 

@@ -119,6 +119,11 @@
 	for(var/datum/wound/wound in wounds)
 		if(istype(wound, /datum/wound))
 			bleed_rate += wound.bleed_rate*/
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	if(!bleed_rate && !length(embedded_objects))
+		grabbedby = SANITIZE_LIST(grabbedby)
+		return 0
+	// [/SURREALIS-ADD]
 	for(var/obj/item/embedded as anything in embedded_objects)
 		if(!embedded.embedding.embedded_bloodloss)
 			continue
@@ -163,12 +168,18 @@
 		do_crit = FALSE
 
 	var/datum/wound/dynwound = manage_dynamic_wound(bclass, dam, armor, pen_info, debuff_applies)
+	if((bclass in GLOB.splatter_bclasses) && !istype(weapon, /obj/projectile) && prob(dam * 2))
+		var/turf/from = get_turf(user || weapon)
+		if(from)
+			owner.blood_spray(get_dir(from, owner))
 
 	if(do_crit)
 		var/datum/component/silverbless/psyblessed = weapon?.GetComponent(/datum/component/silverbless)
 		var/sundering = HAS_TRAIT(owner, TRAIT_SILVER_WEAK) && istype(weapon) && weapon?.is_silver && psyblessed?.is_blessed
 		var/crit_attempt = try_crit(sundering ? BCLASS_SUNDER : bclass, dam, user, zone_precise, silent, crit_message)
 		if(crit_attempt)
+			if((bclass in GLOB.gore_bclasses) && istype(crit_attempt, /datum/wound))
+				owner.blood_squirt()
 			if(bclass == BCLASS_BURN && user && user != owner)
 				shake_camera(user, 2, 2)
 				flash_color(user, "#a83c1a", 15)
@@ -559,8 +570,11 @@
 						attempted_wounds +=/datum/wound/fracture/head/nose
 					else
 						attempted_wounds += /datum/wound/facial/disfigurement/nose
-				else if(zone_precise in knockout_zones)
-					attempted_wounds += /datum/wound/fracture/head/brain
+				else if(zone_precise in knockout_zones) //because vampires/skeletons exist
+					if(has_wound(/datum/wound/fracture/head/brain))
+						attempted_wounds += /datum/wound/fracture/head/brain/shatter
+					else
+						attempted_wounds += /datum/wound/fracture/head/brain
 	if(bclass in GLOB.sunder_bclasses)
 		if(HAS_TRAIT(owner, TRAIT_SILVER_WEAK) && !owner.has_status_effect(STATUS_EFFECT_ANTIMAGIC))
 			used = round(damage_dividend * 20 + (dam / 2), 1)
@@ -618,6 +632,9 @@
 	if(istype(embedder, /obj/item/natural/worms/leech))
 		record_round_statistic(STATS_LEECHES_EMBEDDED)
 	LAZYADD(embedded_objects, embedder)
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	owner?.life_work |= LIFEWORK_WOUNDS
+	// [/SURREALIS-ADD]
 	embedder.is_embedded = TRUE
 	embedder.embedded_host = src
 	embedder.forceMove(src)
@@ -798,7 +815,7 @@
 			returned_flags |= SURGERY_CLAMPED
 	if(has_wound(/datum/wound/dislocation))
 		returned_flags |= SURGERY_DISLOCATED
-	if(has_wound(/datum/wound/fracture))
+	if(has_wound(/datum/wound/fracture) || isooze(owner))
 		returned_flags |= SURGERY_BROKEN
 	if(has_wound(/datum/wound/slash/vein))
 		returned_flags |= SURGERY_CUTVEIN

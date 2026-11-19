@@ -186,6 +186,9 @@ GLOBAL_LIST_INIT(primordial_wounds, init_primordial_wounds())
 	sortTim(affected.wounds, GLOBAL_PROC_REF(cmp_wound_severity_dsc))
 	bodypart_owner = affected
 	owner = bodypart_owner.owner
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	affected.owner.life_work |= LIFEWORK_WOUNDS
+	// [/SURREALIS-ADD]
 	var/initial_bleed = bleed_rate
 	bleed_rate = 0
 	var/mob/living/carbon/human/H = owner
@@ -251,6 +254,9 @@ GLOBAL_LIST_INIT(primordial_wounds, init_primordial_wounds())
 	else if(owner)
 		remove_from_mob()
 	LAZYADD(affected.simple_wounds, src)
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	affected.life_work |= LIFEWORK_WOUNDS
+	// [/SURREALIS-ADD]
 	sortList(affected.simple_wounds, GLOBAL_PROC_REF(cmp_wound_severity_dsc))
 	owner = affected
 	owner.simple_bleeding += bleed_rate // immediately apply our base bleed to the host mob
@@ -320,13 +326,9 @@ GLOBAL_LIST_INIT(primordial_wounds, init_primordial_wounds())
 /// Called on handle_wounds(), on the life() proc
 /datum/wound/proc/on_death()
 	// for optimization's sake, only do dead wound healing if the mob has a client.
-	if (!owner.client)
+	if(!owner.client)
 		return
 
-	if (HAS_TRAIT(owner, TRAIT_PSYDONITE) && !passive_healing && !HAS_TRAIT(src, TRAIT_BLACKBLOOD))
-		heal_wound(0.6) // psydonites are supposed to apparently slightly heal wounds whether dead or alive
-		if(!istype(src, /datum/wound/slash/incision))
-			heal_wound(0.6)
 	return TRUE
 
 /// Setter for any adjustments we make to our bleed_rate, propagating them to the host bodypart.

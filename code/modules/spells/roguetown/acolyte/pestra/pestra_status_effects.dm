@@ -49,8 +49,15 @@
 /datum/status_effect/buff/divine_rebirth_healing/tick()
 	if(HAS_TRAIT(owner, TRAIT_IRONMAN))
 		return
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	var/time_progress = (duration - time_left) / duration
 	time_left -= tick_interval
+	*/
+	var/time_progress = (expires_at - time_left) / expires_at
+	time_left -= next_tick
+	// [/SURREALIS-EDIT]
 	// This shouldn't ever dip below 5, but let's use MAX for safety anyways
 	healing_strength = max(5, healing_strength - (time_progress * (healing_strength - 5)))
 	var/obj/effect/temp_visual/heal/H = new /obj/effect/temp_visual/heal_rogue(get_turf(owner))
@@ -146,7 +153,7 @@
 	owner.adjustCloneLoss(-healing_strength, 0)
 
 /atom/movable/screen/alert/status_effect/buff/pestra_care
-	name = "Pestra's embrace"
+	name = "Pestra's Embrace"
 	desc = "It's like something is wriggling around inside of me, but it's making me feel better..."
 	icon_state = "buff"
 
@@ -208,7 +215,7 @@
 	examine_text = "SUBJECTPRONOUN is surrounded by an ominous aura of disease."
 
 /atom/movable/screen/alert/status_effect/black_rot_carrier
-	name = "Pestra's blessing"
+	name = "Pestra's Blessing"
 	desc = "I carry Pestra's blessing, people should avoid my touch."
 
 /datum/status_effect/black_rot_debility

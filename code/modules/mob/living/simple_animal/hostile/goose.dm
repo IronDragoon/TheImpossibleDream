@@ -93,7 +93,7 @@
 			visible_message(span_notice("[src] looks too full to eat \the [tasty]!"))
 			message_cooldown = world.time + 5 SECONDS
 		return
-	if (tasty.foodtype & GROSS)
+	if (tasty.food_quality & GROSS)
 		visible_message(span_notice("[src] hungrily gobbles up \the [tasty]!"))
 		tasty.forceMove(src)
 		playsound(src,'sound/blank.ogg', 70, TRUE)
@@ -163,7 +163,12 @@
 		vomit() // its supposed to keep vomiting if you move
 		return
 	var/turf/currentTurf = get_turf(src)
-	while (currentTurf == get_turf(src))
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// while (currentTurf == get_turf(src)) // SURREALIS-EDIT - ORIGINAL
+	if(!currentTurf)
+		return
+	while (!QDELETED(src) && currentTurf == get_turf(src))
+	// [/SURREALIS-EDIT]
 		var/obj/item/reagent_containers/food/tasty = locate() in currentTurf
 		if (tasty)
 			feed(tasty)

@@ -1,6 +1,9 @@
 /mob/living
 	/// Simple wound instances with no associated bodyparts
 	var/list/datum/wound/simple_wounds
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	var/life_work = LIFEWORK_WOUNDS
+	// [/SURREALIS-ADD]
 	/// Simple embedded objects with no associated bodyparts
 	var/list/obj/item/simple_embedded_objects
 	/// Cached value of simple wound bleeding
@@ -59,12 +62,14 @@
 		return wound
 
 /// Loops through our list of wounds healing them until we run out of healing or all wounds are healed
-/mob/living/proc/heal_wounds(heal_amount, list/specific_types, psydonite = FALSE)
+/mob/living/proc/heal_wounds(heal_amount, list/specific_types, psydonite = FALSE, maxsev)
 	var/healed_any = FALSE
 	if(has_status_effect(/datum/status_effect/buff/fortify))
 		heal_amount *= 1.3
 	for(var/datum/wound/wound as anything in get_wounds())
 		if(isnull(wound))
+			continue
+		if(!isnull(maxsev) && wound.severity > maxsev)
 			continue
 		if(psydonite) //Checks if the proc was invoked by TRAIT_PSYDONITE to avoid healing incisions.
 			if(istype(wound, /datum/wound/slash/incision))

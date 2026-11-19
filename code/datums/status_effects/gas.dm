@@ -1,4 +1,7 @@
 /datum/status_effect/freon
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	tick_interval = 1 SECONDS
+	// [/SURREALIS-ADD]
 	id = "frozen"
 	duration = 100
 	status_type = STATUS_EFFECT_UNIQUE
@@ -36,7 +39,6 @@
 	if(!owner.stat)
 		to_chat(owner, span_notice("The cube melts!"))
 	owner.cut_overlay(cube)
-	owner.adjust_bodytemperature(100)
 	owner.update_mobility()
 	UnregisterSignal(owner, COMSIG_LIVING_RESIST)
 

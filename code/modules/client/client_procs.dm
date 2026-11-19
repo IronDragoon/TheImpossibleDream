@@ -195,6 +195,10 @@ GLOBAL_LIST_EMPTY(respawncounts)
 
 	..()	//redirect to hsrc.Topic()
 
+/client/proc/is_localhost()
+	var/static/list/localhost_addresses = list("127.0.0.1", "::1")
+	return isnull(address) || (address in localhost_addresses)
+
 /client/proc/view_stats()
 	set name = "View Chronicle"
 	set category = "OOC"
@@ -336,8 +340,7 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 			else
 				new /datum/admins(autorank, ckey)
 	if(CONFIG_GET(flag/enable_localhost_rank) && !connecting_admin)
-		var/localhost_addresses = list("127.0.0.1", "::1")
-		if(isnull(address) || (address in localhost_addresses))
+		if(is_localhost())
 			var/datum/admin_rank/localhost_rank = new("!localhost!", R_EVERYTHING, R_DBRANKS, R_EVERYTHING) //+EVERYTHING -DBRANKS *EVERYTHING
 			new /datum/admins(localhost_rank, ckey, 1, 1)
 	check_localhost_command_bar()
@@ -1128,6 +1131,12 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 /client/proc/update_movement_keys()
 	if(!prefs?.key_bindings)
 		return
+	// [SURREALIS-ADD] - PLASMA_OPTS
+	if(!length(prefs.key_bindings))
+		if(length(movement_keys))
+			log_game("WARNING: [ckey] has empty key_bindings, preserving existing movement_keys")
+		return
+	// [/SURREALIS-ADD]
 	movement_keys = list()
 	for(var/key in prefs.key_bindings)
 		for(var/kb_name in prefs.key_bindings[key])
@@ -1152,7 +1161,10 @@ GLOBAL_LIST_EMPTY(external_rsc_urls)
 		var/mob/living/M = mob
 		M.update_damage_hud()
 	if (prefs.auto_fit_viewport)
-		addtimer(CALLBACK(src, VERB_REF(fit_viewport), 1 SECONDS)) //Delayed to avoid wingets from Login calls.
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// addtimer(CALLBACK(src, VERB_REF(fit_viewport), 1 SECONDS)) //Delayed to avoid wingets from Login calls. // SURREALIS-EDIT - ORIGINAL
+		addtimer(CALLBACK(src, VERB_REF(fit_viewport)), 1 SECONDS) //Delayed to avoid wingets from Login calls.
+		// [/SURREALIS-EDIT]
 
 /client/proc/generate_clickcatcher()
 	if(!void)

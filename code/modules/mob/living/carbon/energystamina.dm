@@ -1,4 +1,11 @@
-/mob/living/proc/update_stamina() //update hud and regen after last_fatigued delay on taking
+// [SURREALIS-EDIT] - PLASMA_OPTS
+// /mob/living/proc/update_stamina() //update hud and regen after last_fatigued delay on taking // SURREALIS-EDIT - ORIGINAL
+/mob/living/proc/update_stamina()
+	calculate_stamina()
+	update_health_hud()
+
+/mob/living/proc/handle_stamina_regen()
+// [/SURREALIS-EDIT]
 	calculate_stamina()
 	var/delay = 20
 	if(HAS_TRAIT(src, TRAIT_APRICITY))
@@ -8,6 +15,10 @@
 			if("night", "dusk")
 				delay = 16
 	if(world.time > last_fatigued + delay) //regen fatigue
+		// [SURREALIS-ADD] - PLASMA_OPTS
+		var/regen_from = max(last_stamina_regen, last_fatigued, world.time - STAMINA_REGEN_MAX_CATCHUP)
+		last_stamina_regen = world.time
+		// [/SURREALIS-ADD]
 		var/added = energy / max_energy
 		added = round(-10 + (added * - 40))
 		if(src.climbing) // no stam regen while climbing guh
@@ -16,8 +27,17 @@
 			added = round(added * 0.5, 1)
 		if(HAS_TRAIT(src, TRAIT_MONK_ROBE))
 			added = round(added * 1.25, 1)
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// SURREALIS-EDIT - ORIGINAL
+		/*
 		if(stamina >= 1)
 			stamina_add(added)
+		*/
+		added = round(added * (world.time - regen_from) / delay, DAMAGE_PRECISION)
+		if(stamina >= 1)
+			if(added)
+				stamina_add(added, natural_regen = TRUE)
+		// [/SURREALIS-EDIT]
 		else
 			stamina = 0
 
@@ -29,8 +49,10 @@
 /mob/living/proc/update_energy()
 	calculate_energy()
 	if(cmode)
-		if(!HAS_TRAIT(src, TRAIT_BREADY))
-			energy_add(-2)
+		if(!HAS_TRAIT(src, TRAIT_BREADY) || !HAS_TRAIT(src, TRAIT_INFINITE_ENERGY))
+			energy_add(-1)
+			if(HAS_TRAIT(src, TRAIT_HIGHER_CMODE_DRAIN))
+				energy_add(-2) //(total of -3 per cycle)
 	if(HAS_TRAIT(src, TRAIT_INFINITE_ENERGY))
 		energy = max_energy
 	if(HAS_TRAIT(src, TRAIT_BREADY))
@@ -99,13 +121,18 @@
 
 	return nutrition_amount
 
-/mob/living/stamina_add(added as num, emote_override, force_emote = TRUE) //call update_stamina here and set last_fatigued, return false when not enough fatigue left
+// [SURREALIS-EDIT] - PLASMA_OPTS
+// /mob/living/stamina_add(added as num, emote_override, force_emote = TRUE) //call update_stamina here and set last_fatigued, return false when not enough fatigue left // SURREALIS-EDIT - ORIGINAL
+/mob/living/stamina_add(added as num, emote_override, force_emote = TRUE, natural_regen = FALSE)
+// [/SURREALIS-EDIT]
 	if(HAS_TRAIT(src, TRAIT_INFINITE_STAMINA))
 		return TRUE
 
 	var/true_added = added
 	if(added > 0)
-		if(HAS_TRAIT(src, TRAIT_FORTITUDE))
+		if(HAS_TRAIT(src, TRAIT_MOMENTUM_RIDER))
+			added = added * 0.5
+		else if(HAS_TRAIT(src, TRAIT_FORTITUDE))
 			added = added * 0.85
 
 	if(added < 0 && HAS_TRAIT(src, TRAIT_FROZEN_STAMINA))
@@ -190,7 +217,11 @@
 						C.heart_attack()
 		return FALSE
 	else
-		last_fatigued = world.time
+		// [SURREALIS-EDIT] - PLASMA_OPTS
+		// last_fatigued = world.time // SURREALIS-EDIT - ORIGINAL
+		if(!natural_regen)
+			last_fatigued = world.time
+		// [/SURREALIS-EDIT]
 		update_health_hud()
 		return TRUE
 

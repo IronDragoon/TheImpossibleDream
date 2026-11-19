@@ -93,39 +93,23 @@ GLOBAL_LIST_INIT(stress_messages, world.file2list("strings/rt/stress_messages.tx
 	else
 		remove_stress(/datum/stressevent/bleeding)
 
-	// pallid outdoor stress
-	if(HAS_TRAIT(src, TRAIT_PALLID))
-		var/area/A = get_area(src)
-		if(A?.outdoors)
-			add_stress(/datum/stressevent/pallid_outdoors)
-		else
-			remove_stress(/datum/stressevent/pallid_outdoors)
-	else
-		remove_stress(/datum/stressevent/pallid_outdoors)
-
-	if(HAS_TRAIT(src, TRAIT_SUNLIGHT_SENSITIVE) || HAS_TRAIT(src, TRAIT_BLACKBLOOD))
+	if(HAS_TRAIT(src, TRAIT_SUNLIGHT_SENSITIVE))
 		var/turf/T = get_turf(src)
 		if(T.can_see_sky() && GLOB.tod == "day")
 			if(HAS_TRAIT(src, TRAIT_WEATHER_PROTECTED))
 				add_stress(/datum/stressevent/lesser_sun_sensitivity)
 			else
-				if(HAS_TRAIT(src, TRAIT_SUNLIGHT_SENSITIVE))
-					src.set_blurriness(100)
-					apply_status_effect(/datum/status_effect/debuff/badvision)
-					add_stress(/datum/stressevent/sun_sensitivity_dark)
-				else
-					add_stress(/datum/stressevent/sun_sensitivity)
+				src.set_blurriness(100)
+				apply_status_effect(/datum/status_effect/debuff/badvision)
+				add_stress(/datum/stressevent/sun_sensitivity_dark)
 		else
 			remove_stress(/datum/stressevent/lesser_sun_sensitivity)
-			remove_stress(/datum/stressevent/sun_sensitivity)
 			remove_stress(/datum/stressevent/sun_sensitivity_dark)
-			if(HAS_TRAIT(src, TRAIT_SUNLIGHT_SENSITIVE))
-				src.set_blurriness(0)
-				remove_status_effect(/datum/status_effect/debuff/badvision)
+			src.set_blurriness(0)
+			remove_status_effect(/datum/status_effect/debuff/badvision)
 	else
 		remove_stress(/datum/stressevent/sun_sensitivity_dark)
 		remove_stress(/datum/stressevent/lesser_sun_sensitivity)
-		remove_stress(/datum/stressevent/sun_sensitivity)
 
 	var/ascending = (new_stress > oldstress)
 
@@ -191,6 +175,12 @@ GLOBAL_LIST_INIT(stress_messages, world.file2list("strings/rt/stress_messages.tx
 	oldstress = new_stress
 	update_stress_visual(new_stress)
 
+// [SURREALIS-ADD] - PLASMA_OPTS
+/mob/living/carbon
+	var/client/stress_visual_client
+	var/stress_visual_fade
+
+// [/SURREALIS-ADD]
 /mob/living/carbon/proc/update_stress_visual(new_stress)
 	if(!client)
 		return
@@ -199,11 +189,24 @@ GLOBAL_LIST_INIT(stress_messages, world.file2list("strings/rt/stress_messages.tx
 	//grain_obj.alpha = 55 + (new_stress * 1.5)
 
 	var/fade_progress = 0
+	// [SURREALIS-EDIT] - PLASMA_OPTS
+	// SURREALIS-EDIT - ORIGINAL
+	/*
 	if(new_stress < 5)
 		fade_progress = 0
 		remove_client_colour(/datum/client_colour/stress_fade)
 	else
 		fade_progress = clamp(((new_stress - 5) / 50), 0, 0.6)
+	*/
+	if(new_stress >= 5)
+		fade_progress = clamp(((new_stress - 5) / 50), 0, 0.6)
+	if(stress_visual_client == client && stress_visual_fade == fade_progress && get_client_color(/datum/client_colour/stress_fade))
+		return
+	stress_visual_client = client
+	stress_visual_fade = fade_progress
+	if(new_stress < 5)
+		remove_client_colour(/datum/client_colour/stress_fade)
+	// [/SURREALIS-EDIT]
 
 	/// Update screen black/white
 	var/datum/client_colour/stress_fade/fade_color = add_client_colour(/datum/client_colour/stress_fade)
@@ -298,8 +301,12 @@ GLOBAL_LIST_INIT(stress_messages, world.file2list("strings/rt/stress_messages.tx
 	for(var/stressor_type in stressors)
 		var/datum/stressevent/event = stressors[stressor_type]
 		var/stress_amt = event.get_stress(src)
+		// [SURREALIS-REMOVE] - PLASMA_OPTS
+		/*
 		if(stress_amt > 0 && HAS_TRAIT(src, TRAIT_BAD_MOOD))
 			stress_amt *= 2
+		*/
+		// [/SURREALIS-REMOVE]
 		if(stress_amt > 0 && HAS_TRAIT(src, TRAIT_EORAN_SERENE))
 			stress_amt = (stress_amt * -1)	//We make the bad things feel good.
 		if((stress_amt >= 0) && (wpmodifier > 0))
